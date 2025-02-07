@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+env:
+  BASE: "${{ github.workspace }}/src/main/java/org/maintainteam/hypatiadatabases"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,13 +22,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Maven Setup
+        run: |
+          sudo apt-get update
+          sudo apt install maven
+
       - name: Start ClamAV daemon clamd
         uses: toblux/start-clamd-github-action@v0.2.1
         with:
           db_main: true
           db_daily: true
       
-      - name: Tests
+      - name: Generate Clamav
         run: |
           mkdir -p "${{ github.workspace }}/output"
           origDir="${{ github.workspace }}/output"
@@ -47,9 +55,9 @@ jobs:
           mv /tmp/mss/*.hdu "$origDir/raw/"
           mv /tmp/mss/*.hsu "$origDir/raw/"
 
-          ls -lah "$origDir"
-          echo "---"
-          ls -lah "$origDir/.."
+      - name: Maven Run
+        run: |
+          mvn clean compile exec:java -Dexec.mainClass="com.example.App" -Dexec.args="$origDir/raw"
 
 
 

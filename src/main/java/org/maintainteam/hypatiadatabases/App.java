@@ -14,6 +14,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+package org.maintainteam.hypatiadatabases;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
@@ -35,7 +36,7 @@ import java.util.regex.Pattern;
 //import org.sqlite.*;
 //import java.sql.*;
 
-public class Main {
+public class App {
 
     private static BloomFilter<String> signaturesMD5Dedupe = null;
     private static BloomFilter<String> signaturesMD5 = null;
