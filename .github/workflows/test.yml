@@ -29,7 +29,7 @@ jobs:
           db_main: true
           db_daily: true
       
-      - name: DATABASE PREPARATION: ClamAV
+      - name: DATABASE PREPARATION - ClamAV
         run: |
           mkdir -p "${{ github.workspace }}/raw/"
           mkdir -p "${{ github.workspace }}/exclusions/"
@@ -47,7 +47,7 @@ jobs:
           mv /tmp/mss/*.hdu "${{ github.workspace }}/raw/"
           mv /tmp/mss/*.hsu "${{ github.workspace }}/raw/"
 
-      - name: DATABASE PREPARATION: ThreatView
+      - name: DATABASE PREPARATION - ThreatView
         run: |
           wget "https://threatview.io/Downloads/MD5-HASH-ALL.txt" -O - | sed 's/MD5 of //' >> "${{ github.workspace }}/raw/threatview.md5"
           wget "https://threatview.io/Downloads/SHA-HASH-FEED.txt" -O - >> "${{ github.workspace }}/raw/threatview.sha1"
@@ -55,7 +55,7 @@ jobs:
           sort -u -o "${{ github.workspace }}/raw/threatview.md5" "${{ github.workspace }}/raw/threatview.md5"
           sort -u -o "${{ github.workspace }}/raw/threatview.sha1" "${{ github.workspace }}/raw/threatview.sha1"
 
-      - name: DATABASE PREPARATION: ThreatFox
+      - name: DATABASE PREPARATION - ThreatFox
         run: |
           sudo apt install unzip
       
