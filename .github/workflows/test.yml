@@ -25,12 +25,27 @@ jobs:
           db_main: true
           db_daily: true
       
-      - name: Install ClamAV
+      - name: Tests
         run: |
-          # apt-get update
-          # apt-get install clamav-daemon
-          # systemctl stop clamav-freshclam
-          # systemctl status clamav-freshclam
-          # freshclam -F
-          ls -la /var/lib/clamav
+          mkdir -p "${{ github.workspace }}/output"
+          origDir="${{ github.workspace }}/output"
+
+          ls -hla /var/lib/clamav
+
+          sudo apt install
+
+          mkdir /tmp/mss
+          cd /tmp/mss
+          cp /var/lib/clamav/main.c*d .
+          cp /var/lib/clamav/daily.c*d .
+          sigtool -u main.c*d
+          sigtool -u daily.c*d
+
+          mv /tmp/mss/*.fp* "$origDir/exclusions/"
+          mv /tmp/mss/*.hsb "$origDir/raw/"
+          mv /tmp/mss/*.hdb "$origDir/raw/"
+          mv /tmp/mss/*.hdu "$origDir/raw/"
+          mv /tmp/mss/*.hsu "$origDir/raw/"
+
+
 
