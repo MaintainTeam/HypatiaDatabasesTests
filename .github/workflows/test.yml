@@ -60,7 +60,7 @@ jobs:
           sudo apt install unzip
       
           wget "https://threatfox.abuse.ch/export/csv/sha256/full/" -O "${{ github.workspace }}/raw/download.zip"
-          unzip "${{ github.workspace }}/raw/download.zip"
+          unzip "${{ github.workspace }}/raw/download.zip" -d "${{ github.workspace }}/raw/full_sha256.csv"
           tail -n +10 "${{ github.workspace }}/raw/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
 
       - name: Maven Run
