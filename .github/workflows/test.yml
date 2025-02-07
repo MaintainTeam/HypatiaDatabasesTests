@@ -21,6 +21,9 @@ jobs:
 
       - name: Start ClamAV daemon clamd
         uses: toblux/start-clamd-github-action@v0.2.1
+        with:
+          db_main: true
+          db_daily: true
       
       - name: Install ClamAV
         run: |
