@@ -19,12 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Start ClamAV daemon clamd
+        uses: toblux/start-clamd-github-action@v0.2.1
+      
       - name: Install ClamAV
         run: |
-          apt-get update
-          apt-get install clamav-daemon
-          systemctl stop clamav-freshclam
-          systemctl status clamav-freshclam
-          freshclam -F
+          # apt-get update
+          # apt-get install clamav-daemon
+          # systemctl stop clamav-freshclam
+          # systemctl status clamav-freshclam
+          # freshclam -F
           ls -la /var/lib/clamav
 
