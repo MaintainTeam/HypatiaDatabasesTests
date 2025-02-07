@@ -29,10 +29,10 @@ jobs:
         run: |
           mkdir -p "${{ github.workspace }}/output"
           origDir="${{ github.workspace }}/output"
+          mkdir -p "$origDir/exclusions/"
+          mkdir -p "$origDir/raw/"
 
           ls -hla /var/lib/clamav
-
-          sudo apt install
 
           mkdir /tmp/mss
           cd /tmp/mss
@@ -40,6 +40,8 @@ jobs:
           cp /var/lib/clamav/daily.c*d .
           sigtool -u main.c*d
           sigtool -u daily.c*d
+
+          ls -hla .
 
           mv /tmp/mss/*.fp* "$origDir/exclusions/"
           mv /tmp/mss/*.hsb "$origDir/raw/"
