@@ -16,11 +16,15 @@ jobs:
     permissions: write-all
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install ClamAV
         run: |
           sudo apt-get update
           sudo apt-get install clamav-daemon
+          sudo systemctl stop clamav-freshclam
           sudo systemctl status clamav-freshclam
           sudo freshclam
+          ls -la /var/lib/clamav
 
-          
