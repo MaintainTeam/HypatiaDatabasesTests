@@ -2,12 +2,8 @@ name: test
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
   generate:
@@ -86,7 +82,7 @@ jobs:
             --dirsfirst \
             --charset utf-8 \
             -I "index.html" \
-            -T "Custom Title" \
+            -T "Database Files" \
             --ignore-case \
             --timefmt "%d-%b-%Y %H:%M" \
             -s \
