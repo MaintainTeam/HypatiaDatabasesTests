@@ -41,13 +41,15 @@ jobs:
           sigtool -u main.c*d
           sigtool -u daily.c*d
 
-          ls -hla .
-
           mv /tmp/mss/*.fp* "$origDir/exclusions/"
           mv /tmp/mss/*.hsb "$origDir/raw/"
           mv /tmp/mss/*.hdb "$origDir/raw/"
           mv /tmp/mss/*.hdu "$origDir/raw/"
           mv /tmp/mss/*.hsu "$origDir/raw/"
+
+          ls -lah "$origDir"
+          echo "---"
+          ls -lah "$origDir/.."
 
 
 
