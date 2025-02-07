@@ -9,9 +9,6 @@ on:
     branches:
       - main
 
-env:
-  BASE: "${{ github.workspace }}/src/main/java/org/maintainteam/hypatiadatabases"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,12 +32,8 @@ jobs:
       
       - name: Generate Clamav
         run: |
-          mkdir -p "${{ github.workspace }}/output"
-          origDir="${{ github.workspace }}/output"
-          mkdir -p "$origDir/exclusions/"
-          mkdir -p "$origDir/raw/"
-
-          ls -hla /var/lib/clamav
+          mkdir -p "${{ github.workspace }}/raw/"
+          mkdir -p "${{ github.workspace }}/exclusions/"
 
           mkdir /tmp/mss
           cd /tmp/mss
@@ -49,24 +42,18 @@ jobs:
           sigtool -u main.c*d
           sigtool -u daily.c*d
 
-          mv /tmp/mss/*.fp* "$origDir/exclusions/"
-          mv /tmp/mss/*.hsb "$origDir/raw/"
-          mv /tmp/mss/*.hdb "$origDir/raw/"
-          mv /tmp/mss/*.hdu "$origDir/raw/"
-          mv /tmp/mss/*.hsu "$origDir/raw/"
+          mv /tmp/mss/*.fp* "${{ github.workspace }}/exclusions/"
+          mv /tmp/mss/*.hsb "${{ github.workspace }}/raw/"
+          mv /tmp/mss/*.hdb "${{ github.workspace }}/raw/"
+          mv /tmp/mss/*.hdu "${{ github.workspace }}/raw/"
+          mv /tmp/mss/*.hsu "${{ github.workspace }}/raw/"
 
       - name: Maven Run
         run: |
-          ls -hla
-          echo "$origDir"
-          ls -la "$origDir"
-          ls -la "$origDir/raw"
-          ls -la "$origDir/exclusions"
-          mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="$origDir/raw/"    
-          echo "$origDir"
-          ls -la "$origDir"
-          ls -la "$origDir/raw"
-          ls -la "$origDir/exclusions"
+          mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/"    
+          ls -lha
+          ls -lha raw
+          ls -lha exclusions 
 
 
 
