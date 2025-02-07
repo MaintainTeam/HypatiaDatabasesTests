@@ -59,6 +59,22 @@ jobs:
           unzip "${{ github.workspace }}/raw/download.zip" -d "${{ github.workspace }}/raw/"
           tail -n +10 "${{ github.workspace }}/raw/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
 
+      - name: DATABASE PREPARATION - CyberCure
+        run: |
+          wget "https://api.cybercure.ai/feed/get_hash?type=csv" -O - | sed 's/,/\n/g' >> "${{ github.workspace }}/raw/cybercure.md5"
+          sort -u -o "${{ github.workspace }}/raw/cybercure.md5" "${{ github.workspace }}/raw/cybercure.md5"
+
+      - name: DATABASE PREPARATION - Stalkerware
+        run: |
+          wget "https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/refs/heads/master/samples.csv" -O "${{ github.workspace }}/raw/stalkerware.csv"
+          while IFS=, read -r col1SHA col2Package col3Certificate col4Version col5Name
+          do
+            if [ -n "$col1SHA" ] && [ -n "$col5Name" ]; then
+              echo "$col1SHA:0:$col5Name" >> "${{ github.workspace }}/raw/stalkerware.hsb";
+            fi;
+          done < "${{ github.workspace }}/raw/stalkerware.csv";
+          sed -i '1d' "${{ github.workspace }}/raw/stalkerware.hsb";
+
       - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
           mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/"
