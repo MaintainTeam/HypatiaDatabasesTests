@@ -76,7 +76,8 @@ jobs:
           cp "${{ github.workspace }}/raw/hypatia-md5-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha1-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha256-bloom.bin" "${{ github.workspace }}/deploy"
-
+          
+          cd "${{ github.workspace }}/deploy"
           find . -type d -print -exec sh -c 'tree "$0" \
             -H "." \
             -L 1 \
