@@ -58,6 +58,10 @@ jobs:
       - name: Maven Run
         run: |
           ls -hla
+          echo "$origDir"
+          ls -la "$origDir"
+          ls -la "$origDir/raw"
+          ls -la "$origDir/exclusions"
           mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="$origDir/raw/"    
           echo "$origDir"
           ls -la "$origDir"
