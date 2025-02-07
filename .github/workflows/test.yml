@@ -29,7 +29,7 @@ jobs:
           db_main: true
           db_daily: true
       
-      - name: ClamAV - Generate
+      - name: DATABASE PREPARATION: ClamAV
         run: |
           mkdir -p "${{ github.workspace }}/raw/"
           mkdir -p "${{ github.workspace }}/exclusions/"
@@ -47,7 +47,7 @@ jobs:
           mv /tmp/mss/*.hdu "${{ github.workspace }}/raw/"
           mv /tmp/mss/*.hsu "${{ github.workspace }}/raw/"
 
-      - name: ThreatView - Generate
+      - name: DATABASE PREPARATION: ThreatView
         run: |
           wget "https://threatview.io/Downloads/MD5-HASH-ALL.txt" -O - | sed 's/MD5 of //' >> "${{ github.workspace }}/raw/threatview.md5"
           wget "https://threatview.io/Downloads/SHA-HASH-FEED.txt" -O - >> "${{ github.workspace }}/raw/threatview.sha1"
@@ -55,7 +55,7 @@ jobs:
           sort -u -o "${{ github.workspace }}/raw/threatview.md5" "${{ github.workspace }}/raw/threatview.md5"
           sort -u -o "${{ github.workspace }}/raw/threatview.sha1" "${{ github.workspace }}/raw/threatview.sha1"
 
-      - name: ThreatFox - Generate
+      - name: DATABASE PREPARATION: ThreatFox
         run: |
           sudo apt install unzip
       
@@ -63,9 +63,27 @@ jobs:
           unzip "${{ github.workspace }}/raw/download.zip" -d "${{ github.workspace }}/raw/"
           tail -n +10 "${{ github.workspace }}/raw/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
 
-      - name: Maven Run
+      - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
-          mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/"    
+          mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/"
+          ls -hla "${{ github.workspace }}/raw/"
+          ls -hla "${{ github.workspace }}/exclusions/"
+
+      - name: Select files to use
+        run: |
+          mkdir -p "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/raw/hypatia-domains-bloom.bin" "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/raw/hypatia-md5-bloom.bin" "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/raw/hypatia-sha1-bloom.bin" "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/raw/hypatia-sha256-bloom.bin" "${{ github.workspace }}/deploy"
+
+      
+      - name: Deploy to Github pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: "${{ github.workspace }}/deploy"
+          force_orphan: true
       
 
 
