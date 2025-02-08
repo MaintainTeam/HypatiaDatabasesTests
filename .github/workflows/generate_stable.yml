@@ -1,4 +1,4 @@
-name: test
+name: Generate Stable Database
 
 on:
   workflow_dispatch:
@@ -117,7 +117,6 @@ jobs:
   sign:
     runs-on: ubuntu-latest
     permissions: write-all
-    needs: generate
 
     steps:    
       - name: Checkout
@@ -125,10 +124,27 @@ jobs:
         with:
           ref: gh-pages  
 
-      - name: WIP Sign
+      - name: Import GPG Key
         run: |
-          echo "sign will be handled later" > tmp.sig
-          echo "see: https://github.com/MaintainTeam/HypatiaDatabases/issues/4"
+          mkdir -p "/tmp/sign"
+          cd "/tmp/sign"
+          echo "Created a test gpg key for testing-only. If you find any problem, please report !"
+          
+          # REVIEW: POSSIBLE SECURITY PROBLEM ????
+          echo "${{ secrets.TEST_GPG_SECRET_BASE64 }}" | base64 -d > "/tmp/sign/private.key"
+          gpg --batch --import "/tmp/sign/private.key"
+          rm "/tmp/sign/private.key"
+
+      - name: Generate Public Key & Signed Files
+        run: | 
+          gpg --batch --export -a --armor "${{ secrets.TEST_GPG_ID }}" > "${{ github.workspace }}/gpg.key"
+          # PUBLIC DATABASE SIGNING KEY: C335CDA7A1C0F66B
+          
+          # REVIEW: POSSIBLE SECURITY PROBLEM ????
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha256-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha256-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-md5-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-md5-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-domains-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-domains-bloom.bin"
 
       - name: Create index.html   
         run: |
@@ -157,8 +173,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: "${{ github.workspace }}"
           force_orphan: false
-
-
 
 
 
