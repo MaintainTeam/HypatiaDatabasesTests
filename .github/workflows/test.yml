@@ -146,7 +146,6 @@ jobs:
           
           echo "<br><hr><br>" >> index.html
           cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
-          echo "<pre>" >> index.html
        
       - name: Deploy to Github pages (with signatures and index)
         uses: peaceiris/actions-gh-pages@v4
