@@ -77,7 +77,8 @@ jobs:
 
       - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
-          mvn clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/"
+          mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/raw/generation_report.txt"
+          cat "${{ github.workspace }}/raw/generation_report.txt"
           ls -hla "${{ github.workspace }}/raw/"
           ls -hla "${{ github.workspace }}/exclusions/"
 
@@ -88,7 +89,9 @@ jobs:
           cp "${{ github.workspace }}/raw/hypatia-md5-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha1-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha256-bloom.bin" "${{ github.workspace }}/deploy"
-          
+      
+      - name: Create index.html   
+        run: |
           cd "${{ github.workspace }}/deploy"
           find . -type d -print -exec sh -c 'tree "$0" \
             -H "." \
@@ -104,6 +107,9 @@ jobs:
             -s \
             -D \
             -o "$0/index.html"' {} \; 
+          
+          echo "<br><hr><br>" >> index.html
+          cat "${{ github.workspace }}/raw/generation_report.txt" >> "${{ github.workspace }}/deploy/index.html"
       
       - name: Deploy to Github pages
         uses: peaceiris/actions-gh-pages@v4
