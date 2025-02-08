@@ -171,6 +171,7 @@ jobs:
           
           echo "<br><hr>Signing Key: " >> index.html
           cat "${{ github.workspace }}/sign_key.txt" >> index.html
+          echo "<br>Current Databases & Index generated with <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">CI</a>" >> index.html
           echo "<hr><br>" >> index.html
           cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
        
