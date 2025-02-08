@@ -14,10 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Maven Setup
+      - name: Dependency Setup
         run: |
           sudo apt-get update
-          sudo apt install maven
+          sudo apt install maven unzip
 
       - name: Start ClamAV daemon clamd
         uses: toblux/start-clamd-github-action@v0.2.1
@@ -58,11 +58,15 @@ jobs:
 
       - name: DATABASE PREPARATION - ThreatFox
         run: |
-          sudo apt install unzip
-      
-          wget "https://threatfox.abuse.ch/export/csv/sha256/full/" -O "${{ github.workspace }}/various/download.zip"
-          unzip "${{ github.workspace }}/various/download.zip" -d "${{ github.workspace }}/various/"
+          wget "https://threatfox.abuse.ch/export/csv/sha256/full/" -O "${{ github.workspace }}/various/download_threatfox.zip"
+          unzip "${{ github.workspace }}/various/download_threatfox.zip" -d "${{ github.workspace }}/various/"
           tail -n +10 "${{ github.workspace }}/various/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
+
+      - name: DATABASE PREPARATION - MalwareBazaar
+        run: |
+          wget "https://bazaar.abuse.ch/export/txt/sha256/full/" -O "${{ github.workspace }}/various/download_bazaar.zip"
+          unzip "${{ github.workspace }}/various/download_bazaar.zip" -d "${{ github.workspace }}/various/"
+          mv "${{ github.workspace }}/various/full_sha256.txt" > "${{ github.workspace }}/raw/malware_bazaar.sha256"
 
       - name: DATABASE PREPARATION - CyberCure
         run: |
