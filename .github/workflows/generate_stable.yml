@@ -84,6 +84,27 @@ jobs:
           done < "${{ github.workspace }}/various/stalkerware.csv";
           sed -i '1d' "${{ github.workspace }}/raw/stalkerware.hsb";
 
+      - name: DATABASE PREPARATION - Sanesecurity
+        run: |
+          mkdir -p "${{ github.workspace }}/various/sanesecurity-real/"
+          cd "${{ github.workspace }}/various/sanesecurity-real/"
+
+          rsync -av rsync://rsync.sanesecurity.net/sanesecurity .
+
+          for f in *.hsb; do
+            echo "" >> "${{ github.workspace }}/raw/sanesecurity-$f";
+            cat "$f" >> "${{ github.workspace }}/raw/sanesecurity-$f";
+            sort -u -o "${{ github.workspace }}/raw/sanesecurity-$f" "${{ github.workspace }}/raw/sanesecurity-$f";
+          done
+
+          for f in *.hdb; do
+            echo "" >> "${{ github.workspace }}/raw/sanesecurity-$f";
+            cat "$f" >> "${{ github.workspace }}/raw/sanesecurity-$f";
+            sort -u -o "${{ github.workspace }}/raw/sanesecurity-$f" "${{ github.workspace }}/raw/sanesecurity-$f";
+          done
+
+            rm -v ${{ github.workspace }}/raw/sanesecurity-crdfam.clamav.hdb ${{ github.workspace }}/raw/sanesecurity-doppelstern.hdb ${{ github.workspace }}/raw/sanesecurity-malware.expert.hdb
+
       - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
           mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/various/generation_report.txt"
