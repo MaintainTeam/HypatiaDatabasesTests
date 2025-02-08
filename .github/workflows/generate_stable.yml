@@ -66,7 +66,7 @@ jobs:
         run: |
           wget "https://bazaar.abuse.ch/export/txt/sha256/full/" -O "${{ github.workspace }}/various/download_bazaar.zip"
           unzip "${{ github.workspace }}/various/download_bazaar.zip" -d "${{ github.workspace }}/various/"
-          mv "${{ github.workspace }}/various/full_sha256.txt" > "${{ github.workspace }}/raw/malware_bazaar.sha256"
+          mv "${{ github.workspace }}/various/full_sha256.txt" "${{ github.workspace }}/raw/malware_bazaar.sha256"
 
       - name: DATABASE PREPARATION - CyberCure
         run: |
