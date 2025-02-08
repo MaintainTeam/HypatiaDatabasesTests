@@ -108,8 +108,9 @@ jobs:
             -D \
             -o "$0/index.html"' {} \; 
           
-          echo "<br><hr><br>" >> index.html
+          echo "<br><hr><br><pre>" >> index.html
           cat "${{ github.workspace }}/raw/generation_report.txt" >> "${{ github.workspace }}/deploy/index.html"
+          echo "<pre>" >> index.html
       
       - name: Deploy to Github pages
         uses: peaceiris/actions-gh-pages@v4
