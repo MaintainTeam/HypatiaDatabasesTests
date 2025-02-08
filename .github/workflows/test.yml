@@ -19,6 +19,12 @@ jobs:
           sudo apt-get update
           sudo apt install maven
 
+      - name: Start ClamAV daemon clamd
+        uses: toblux/start-clamd-github-action@v0.2.1
+        with:
+          db_main: true
+          db_daily: true
+      
       - name: Organize Directories & Static Sources
         run: |
           mkdir -p "${{ github.workspace }}/raw/"
@@ -26,16 +32,9 @@ jobs:
           mkdir -p "${{ github.workspace }}/various/"
 
           cp -r "${{ github.workspace }}/static/" "${{ github.workspace }}/raw/"
-
-      - name: Start ClamAV daemon clamd
-        uses: toblux/start-clamd-github-action@v0.2.1
-        with:
-          db_main: true
-          db_daily: true
       
       - name: DATABASE PREPARATION - ClamAV
         run: |
-          tree  "${{ github.workspace }}"
           mkdir /tmp/mss
           cd /tmp/mss
           cp /var/lib/clamav/main.c*d .
