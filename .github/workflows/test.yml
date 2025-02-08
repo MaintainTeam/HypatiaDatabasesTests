@@ -31,7 +31,7 @@ jobs:
           mkdir -p "${{ github.workspace }}/exclusions/"
           mkdir -p "${{ github.workspace }}/various/"
 
-          cp -r "${{ github.workspace }}/static/" "${{ github.workspace }}/raw/"
+          cp "${{ github.workspace }}/static/*" "${{ github.workspace }}/raw/"
       
       - name: DATABASE PREPARATION - ClamAV
         run: |
