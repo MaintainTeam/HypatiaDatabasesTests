@@ -17,8 +17,6 @@ jobs:
 
       - name: WIP Sign
         run: |
-          #export GPG_TTY=$(tty)  # https://stackoverflow.com/questions/72445825/gpg-error-inappropriate-ioctl-for-device
-          # GPG_TTY=`tty`  # https://unix.stackexchange.com/questions/714824/gpg-signing-failed-no-such-file-or-directory # it does same thing actually?
           mkdir -p "/tmp/sign"
           cd "/tmp/sign"
           echo "Created a test gpg key for testing-only. If you find any problem, please report !"
@@ -35,10 +33,10 @@ jobs:
           gpg --version
           ls -la "${{ github.workspace }}"
           # FIXME: IS THESE SAFE ???
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha256-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha256-bloom.bin"
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-md5-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-md5-bloom.bin"
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-domains-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-domains-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha256-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha256-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-md5-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-md5-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-domains-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-domains-bloom.bin"
 
       - name: Create index.html   
         run: |
