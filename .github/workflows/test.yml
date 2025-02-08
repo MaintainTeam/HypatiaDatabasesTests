@@ -78,8 +78,11 @@ jobs:
 
       - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
-          mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/various/generation_report.html"
-          cat "${{ github.workspace }}/various/generation_report.html"
+          mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/various/generation_report.txt"
+          cat "${{ github.workspace }}/various/generation_report.txt"
+          echo "<pre>" >> "${{ github.workspace }}/various/generation_report.html"
+          cat "${{ github.workspace }}/various/generation_report.txt" >> "${{ github.workspace }}/various/generation_report.html"
+          echo "</pre>" >> "${{ github.workspace }}/various/generation_report.html"
           
       - name: Debug Info
         run: |
@@ -121,6 +124,7 @@ jobs:
       - name: WIP Sign
         run: |
           echo "sign will be handled" > tmp.sig
+          echo "sign will be handled - 2nd test" > tmp2.sig
 
       - name: Create index.html   
         run: |
@@ -140,7 +144,7 @@ jobs:
             -D \
             -o "$0/index.html"' {} \; 
           
-          echo "<br><hr><br><pre>" >> index.html
+          echo "<br><hr><br>" >> index.html
           cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
           echo "<pre>" >> index.html
        
