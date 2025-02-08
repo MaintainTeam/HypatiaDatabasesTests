@@ -139,7 +139,11 @@ jobs:
       - name: Generate Public Key & Signed Files
         run: | 
           gpg --batch --export -a --armor "${{ secrets.TEST_GPG_ID }}" > "${{ github.workspace }}/gpg.key"
-          # PUBLIC DATABASE SIGNING KEY: C335CDA7A1C0F66B
+
+          gpg --batch --dry-run -v --import gpg.key 2>"${{ github.workspace }}/file.txt"
+          cat "${{ github.workspace }}/file.txt" | grep -o '/[^ ]*' | cut -c2- > "${{ github.workspace }}/sign_key.txt"
+          rm "${{ github.workspace }}/file.txt"
+          # EXPORTS DATABASE SIGNING KEY: C335CDA7A1C0F66B
           
           # REVIEW: POSSIBLE SECURITY PROBLEM ????
           echo "${{ secrets.TEST_GPG_PASS }}" | gpg --pinentry-mode=loopback --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
@@ -165,7 +169,9 @@ jobs:
             -D \
             -o "$0/index.html"' {} \; 
           
-          echo "<br><hr><br>" >> index.html
+          echo "<br><hr>Signing Key: " >> index.html
+          cat "${{ github.workspace }}/sign_key.txt" >> index.html
+          echo "<hr><br>" >> index.html
           cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
        
       - name: Deploy to Github pages (with signatures and index)
