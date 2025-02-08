@@ -35,6 +35,7 @@ jobs:
       
       - name: DATABASE PREPARATION - ClamAV
         run: |
+          tree  "${{ github.workspace }}"
           mkdir /tmp/mss
           cd /tmp/mss
           cp /var/lib/clamav/main.c*d .
