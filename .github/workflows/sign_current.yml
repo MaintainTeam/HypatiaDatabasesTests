@@ -32,6 +32,7 @@ jobs:
           gpg --batch --export -a --armor "${{ secrets.TEST_GPG_ID }}" > "${{ github.workspace }}/gpg.key"
           ls -la
           pwd
+          gpg --version
           ls -la "${{ github.workspace }}"
           # FIXME: IS THESE SAFE ???
           echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
