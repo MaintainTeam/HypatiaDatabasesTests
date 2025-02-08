@@ -34,10 +34,10 @@ jobs:
           pwd
           ls -la "${{ github.workspace }}"
           # FIXME: IS THESE SAFE ???
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-sha1-bloom.bin.sig --detach-sig hypatia-sha1-bloom.bin
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-sha256-bloom.bin.sig --detach-sig hypatia-sha256-bloom.bin
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-md5-bloom.bin.sig --detach-sig hypatia-md5-bloom.bin
-          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-domains-bloom.bin.sig --detach-sig hypatia-domains-bloom.bin
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha1-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha1-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-sha256-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-sha256-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-md5-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-md5-bloom.bin"
+          echo "${{ secrets.TEST_GPG_PASS }}" | gpg -v --batch -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output "${{ github.workspace }}/hypatia-domains-bloom.bin.sig" --detach-sig "${{ github.workspace }}/hypatia-domains-bloom.bin"
 
       - name: Create index.html   
         run: |
