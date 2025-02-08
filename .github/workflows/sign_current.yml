@@ -1,0 +1,56 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  sign:
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:    
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages  
+
+      - name: WIP Sign
+        run: |
+          echo "Created a test gpg key for testing-only. If you find any problem, please report !"
+
+          // TODO import ${{ secrets.HYPATIA_DATABASE_GPG_KEY }} to runner (any safer way?)
+          // TODO sign file one by one with using ${{ secrets.HYPATIA_DATABASE_GPG_PASS }} key
+
+      - name: Create index.html   
+        run: |
+          cd "${{ github.workspace }}"
+          find . -type d -print -exec sh -c 'tree "$0" \
+            -H "." \
+            -L 1 \
+            --noreport \
+            --houtro "" \
+            --dirsfirst \
+            --charset utf-8 \
+            -I "index.html" \
+            -T "Files" \
+            --ignore-case \
+            --timefmt "%d-%b-%Y %H:%M" \
+            -s \
+            -D \
+            -o "$0/index.html"' {} \; 
+          
+          echo "<br><hr><br>" >> index.html
+          cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
+       
+      - name: Deploy to Github pages (with signatures and index)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: "${{ github.workspace }}"
+          force_orphan: false
+
+
+
+
+

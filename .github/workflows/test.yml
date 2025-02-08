@@ -19,6 +19,14 @@ jobs:
           sudo apt-get update
           sudo apt install maven
 
+      - name: Organize Directories & Static Sources
+        run: |
+          mkdir -p "${{ github.workspace }}/raw/"
+          mkdir -p "${{ github.workspace }}/exclusions/"
+          mkdir -p "${{ github.workspace }}/various/"
+
+          cp -r "${{ github.workspace }}/static/" "${{ github.workspace }}/raw/"
+
       - name: Start ClamAV daemon clamd
         uses: toblux/start-clamd-github-action@v0.2.1
         with:
@@ -27,10 +35,6 @@ jobs:
       
       - name: DATABASE PREPARATION - ClamAV
         run: |
-          mkdir -p "${{ github.workspace }}/raw/"
-          mkdir -p "${{ github.workspace }}/exclusions/"
-          mkdir -p "${{ github.workspace }}/various/"
-
           mkdir /tmp/mss
           cd /tmp/mss
           cp /var/lib/clamav/main.c*d .
@@ -123,8 +127,8 @@ jobs:
 
       - name: WIP Sign
         run: |
-          echo "sign will be handled" > tmp.sig
-          echo "sign will be handled - 2nd test" > tmp2.sig
+          echo "sign will be handled later" > tmp.sig
+          echo "see: https://github.com/MaintainTeam/HypatiaDatabases/issues/4"
 
       - name: Create index.html   
         run: |
@@ -137,7 +141,7 @@ jobs:
             --dirsfirst \
             --charset utf-8 \
             -I "index.html" \
-            -T "Database Files" \
+            -T "Files" \
             --ignore-case \
             --timefmt "%d-%b-%Y %H:%M" \
             -s \
