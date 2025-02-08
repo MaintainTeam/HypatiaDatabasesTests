@@ -117,6 +117,7 @@ jobs:
   sign:
     runs-on: ubuntu-latest
     permissions: write-all
+    needs: generate
 
     steps:    
       - name: Checkout
