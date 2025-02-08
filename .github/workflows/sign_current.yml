@@ -17,7 +17,7 @@ jobs:
 
       - name: WIP Sign
         run: |
-          export GPG_TTY=$(tty)  # https://stackoverflow.com/questions/72445825/gpg-error-inappropriate-ioctl-for-device
+          #export GPG_TTY=$(tty)  # https://stackoverflow.com/questions/72445825/gpg-error-inappropriate-ioctl-for-device
           # GPG_TTY=`tty`  # https://unix.stackexchange.com/questions/714824/gpg-signing-failed-no-such-file-or-directory # it does same thing actually?
           mkdir -p "/tmp/sign"
           cd "/tmp/sign"
