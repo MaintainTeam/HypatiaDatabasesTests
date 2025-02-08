@@ -29,6 +29,7 @@ jobs:
         run: |
           mkdir -p "${{ github.workspace }}/raw/"
           mkdir -p "${{ github.workspace }}/exclusions/"
+          mkdir -p "${{ github.workspace }}/various/"
 
           mkdir /tmp/mss
           cd /tmp/mss
@@ -45,42 +46,47 @@ jobs:
 
       - name: DATABASE PREPARATION - ThreatView
         run: |
-          wget "https://threatview.io/Downloads/MD5-HASH-ALL.txt" -O - | sed 's/MD5 of //' >> "${{ github.workspace }}/raw/threatview.md5"
-          wget "https://threatview.io/Downloads/SHA-HASH-FEED.txt" -O - >> "${{ github.workspace }}/raw/threatview.sha1"
+          wget "https://threatview.io/Downloads/MD5-HASH-ALL.txt" -O - | sed 's/MD5 of //' >> "${{ github.workspace }}/various/threatview.md5"
+          wget "https://threatview.io/Downloads/SHA-HASH-FEED.txt" -O - >> "${{ github.workspace }}/various/threatview.sha1"
 
-          sort -u -o "${{ github.workspace }}/raw/threatview.md5" "${{ github.workspace }}/raw/threatview.md5"
-          sort -u -o "${{ github.workspace }}/raw/threatview.sha1" "${{ github.workspace }}/raw/threatview.sha1"
+          sort -u -o "${{ github.workspace }}/raw/threatview.md5" "${{ github.workspace }}/various/threatview.md5"
+          sort -u -o "${{ github.workspace }}/raw/threatview.sha1" "${{ github.workspace }}/various/threatview.sha1"
 
       - name: DATABASE PREPARATION - ThreatFox
         run: |
           sudo apt install unzip
       
-          wget "https://threatfox.abuse.ch/export/csv/sha256/full/" -O "${{ github.workspace }}/raw/download.zip"
-          unzip "${{ github.workspace }}/raw/download.zip" -d "${{ github.workspace }}/raw/"
-          tail -n +10 "${{ github.workspace }}/raw/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
+          wget "https://threatfox.abuse.ch/export/csv/sha256/full/" -O "${{ github.workspace }}/various/download.zip"
+          unzip "${{ github.workspace }}/various/download.zip" -d "${{ github.workspace }}/various/"
+          tail -n +10 "${{ github.workspace }}/various/full_sha256.csv" | awk '{ print $4 } ' | sed 's/^"//' | sed 's/",$//' > "${{ github.workspace }}/raw/threatfox.sha256"
 
       - name: DATABASE PREPARATION - CyberCure
         run: |
-          wget "https://api.cybercure.ai/feed/get_hash?type=csv" -O - | sed 's/,/\n/g' >> "${{ github.workspace }}/raw/cybercure.md5"
-          sort -u -o "${{ github.workspace }}/raw/cybercure.md5" "${{ github.workspace }}/raw/cybercure.md5"
+          wget "https://api.cybercure.ai/feed/get_hash?type=csv" -O - | sed 's/,/\n/g' >> "${{ github.workspace }}/various/cybercure.md5"
+          sort -u -o "${{ github.workspace }}/raw/cybercure.md5" "${{ github.workspace }}/various/cybercure.md5"
 
       - name: DATABASE PREPARATION - Stalkerware
         run: |
-          wget "https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/refs/heads/master/samples.csv" -O "${{ github.workspace }}/raw/stalkerware.csv"
+          wget "https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/refs/heads/master/samples.csv" -O "${{ github.workspace }}/various/stalkerware.csv"
           while IFS=, read -r col1SHA col2Package col3Certificate col4Version col5Name
           do
             if [ -n "$col1SHA" ] && [ -n "$col5Name" ]; then
               echo "$col1SHA:0:$col5Name" >> "${{ github.workspace }}/raw/stalkerware.hsb";
             fi;
-          done < "${{ github.workspace }}/raw/stalkerware.csv";
+          done < "${{ github.workspace }}/various/stalkerware.csv";
           sed -i '1d' "${{ github.workspace }}/raw/stalkerware.hsb";
 
       - name: GENERATE HYPATIA SIGNATURE DATABASES 
         run: |
-          mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/raw/generation_report.txt"
-          cat "${{ github.workspace }}/raw/generation_report.txt"
+          mvn -q -B --no-transfer-progress clean compile exec:java -Dexec.mainClass="org.maintainteam.hypatiadatabases.App" -Dexec.args="${{ github.workspace }}/raw/" > "${{ github.workspace }}/various/generation_report.html"
+          cat "${{ github.workspace }}/various/generation_report.html"
+          
+      - name: Debug Info
+        run: |
+          ls -hla "${{ github.workspace }}/various/"
           ls -hla "${{ github.workspace }}/raw/"
           ls -hla "${{ github.workspace }}/exclusions/"
+          tree -a "${{ github.workspace }}"
 
       - name: Select files to use
         run: |
@@ -89,10 +95,34 @@ jobs:
           cp "${{ github.workspace }}/raw/hypatia-md5-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha1-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha256-bloom.bin" "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/various/generation_report.html" "${{ github.workspace }}/deploy"
+
+          date > "${{ github.workspace }}/deploy/generation_time.html"
       
+      - name: Deploy to Github pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: "${{ github.workspace }}/deploy"
+          force_orphan: true
+  
+
+  sign:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: generate
+
+    steps:    
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: WIP Sign
+        run: |
+          echo "sign will be handled" > tmp.sig
+
       - name: Create index.html   
         run: |
-          cd "${{ github.workspace }}/deploy"
+          cd "${{ github.workspace }}"
           find . -type d -print -exec sh -c 'tree "$0" \
             -H "." \
             -L 1 \
@@ -109,17 +139,15 @@ jobs:
             -o "$0/index.html"' {} \; 
           
           echo "<br><hr><br><pre>" >> index.html
-          cat "${{ github.workspace }}/raw/generation_report.txt" >> "${{ github.workspace }}/deploy/index.html"
+          cat "${{ github.workspace }}/generation_report.html" >> "${{ github.workspace }}/index.html"
           echo "<pre>" >> index.html
-      
-      - name: Deploy to Github pages
+       
+      - name: Deploy to Github pages (with signatures and index)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: "${{ github.workspace }}/deploy"
-          force_orphan: true
-      
-
+          publish_dir: "${{ github.workspace }}"
+          force_orphan: false
 
 
 
