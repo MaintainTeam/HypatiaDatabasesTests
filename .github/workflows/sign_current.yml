@@ -20,9 +20,9 @@ jobs:
           mkdir -p "/tmp/sign"
           cd "/tmp/sign"
           echo "Created a test gpg key for testing-only. If you find any problem, please report !"
-          // C335CDA7A1C0F66B
+          # C335CDA7A1C0F66B
           echo "${{ secrets.TEST_GPG_SECRET_BASE64 }}" | base64 -d > "/tmp/sign/private.key"
-          // FIXME: IS IT SAFE ????
+          # FIXME: IS IT SAFE ????
           gpg --import "/tmp/sign/private.key"
           rm "/tmp/sign/private.key"
 
@@ -31,7 +31,7 @@ jobs:
 
           gpg -u "${{ secrets.TEST_GPG_ID }}" --output 
           
-          // FIXME: IS THESE SAFE ???
+          # FIXME: IS THESE SAFE ???
           echo "${{ secrets.TEST_GPG_PASS }}" | gpg -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-sha1-bloom.bin.sig --detach-sig hypatia-sha1-bloom.bin
           echo "${{ secrets.TEST_GPG_PASS }}" | gpg -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-sha256-bloom.bin.sig --detach-sig hypatia-sha256-bloom.bin
           echo "${{ secrets.TEST_GPG_PASS }}" | gpg -u "${{ secrets.TEST_GPG_ID }}" --passphrase-fd 0 --output hypatia-md5-bloom.bin.sig --detach-sig hypatia-md5-bloom.bin
