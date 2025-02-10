@@ -16,8 +16,8 @@ jobs:
 
       - name: Dependency Setup
         run: |
-          sudo apt-get update
-          sudo apt install maven unzip
+          sudo apt-get update -y
+          sudo apt install maven unzip git dos2unix -y
 
       - name: Start ClamAV daemon clamd
         uses: toblux/start-clamd-github-action@v0.2.1
@@ -47,6 +47,28 @@ jobs:
           mv /tmp/mss/*.hdb "${{ github.workspace }}/raw/"
           mv /tmp/mss/*.hdu "${{ github.workspace }}/raw/"
           mv /tmp/mss/*.hsu "${{ github.workspace }}/raw/"
+
+      - name: DATABASE PREPARATION - ESET
+        run: |
+          git clone https://github.com/eset/malware-ioc "${{ github.workspace }}/various/eset-sources/"
+          processHashes() {
+            local name=$(basename $1);
+            if [ -f $1/samples.$2 ]; then
+              dos2unix $1/samples.$2
+              while IFS= read -r line
+              do
+                echo "$line" >> "${{ github.workspace }}/various/eset.$2";
+              done < "$1/samples.$2";
+            fi;
+          }
+          export -f processHashes;
+
+          find "${{ github.workspace }}/various/eset-sources/" -maxdepth 2 -mindepth 1 -type d -exec bash -c 'processHashes "{}" md5 hdb' \;
+          find "${{ github.workspace }}/various/eset-sources/" -maxdepth 2 -mindepth 1 -type d -exec bash -c 'processHashes "{}" sha1 hsb' \;
+          find "${{ github.workspace }}/various/eset-sources/" -maxdepth 2 -mindepth 1 -type d -exec bash -c 'processHashes "{}" sha256 hsb' \;
+          cp "${{ github.workspace }}/various/eset.md5" "${{ github.workspace }}/raw"
+          cp "${{ github.workspace }}/various/eset.sha1" "${{ github.workspace }}/raw"
+          cp "${{ github.workspace }}/various/eset.sha256" "${{ github.workspace }}/raw"
 
       - name: DATABASE PREPARATION - Signature-Base
         run: |
