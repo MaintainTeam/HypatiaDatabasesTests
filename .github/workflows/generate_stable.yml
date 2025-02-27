@@ -139,6 +139,8 @@ jobs:
           echo "<pre>" >> "${{ github.workspace }}/various/generation_report.html"
           cat "${{ github.workspace }}/various/generation_report.txt" >> "${{ github.workspace }}/various/generation_report.html"
           echo "</pre>" >> "${{ github.workspace }}/various/generation_report.html"
+
+          echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">"${{ github.workspace }}/various/database_generation_ci.txt"
           
       - name: Debug Info
         run: |
@@ -155,10 +157,11 @@ jobs:
           cp "${{ github.workspace }}/raw/hypatia-sha1-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/raw/hypatia-sha256-bloom.bin" "${{ github.workspace }}/deploy"
           cp "${{ github.workspace }}/various/generation_report.html" "${{ github.workspace }}/deploy"
+          cp "${{ github.workspace }}/various/database_generation_ci.txt" "${{ github.workspace }}/deploy"
 
           date > "${{ github.workspace }}/deploy/generation_time.html"
       
-      - name: Deploy to Github pages
+      - name: Deploy to unsigned branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
